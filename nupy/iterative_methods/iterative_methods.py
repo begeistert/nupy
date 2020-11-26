@@ -1,4 +1,4 @@
-from nupy.algebra import evaluate
+from nupy.sympy_algebra import evaluate
 from pandas import DataFrame, set_option
 
 
