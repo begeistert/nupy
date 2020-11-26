@@ -76,7 +76,6 @@ def intermediate_value(function, variable, intervals, tolerance=1e-10, limit=250
             if iteration_1 > limit:
                 break
     data = DataFrame(iterations, columns=header)
-    data.index.name = "Iteration"
     return data if not just_root else iterations["p_n"][iteration_1 - 1]
 
 
@@ -150,5 +149,4 @@ def secant(function, variable, intervals, tolerance=1e-10, limit=250, just_root=
         elif n_iteration > 250:
             break
     data = DataFrame(iterations, columns=header)
-    data.index.name = "Iteration"
     return data if not just_root else iterations['x_n'][len(iterations['x_n']) - 1]
