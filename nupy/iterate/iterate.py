@@ -1,4 +1,4 @@
-from nupy.algebra import eval
+from nupy.algebra import evaluate
 from pandas import DataFrame, set_option
 
 
@@ -19,22 +19,22 @@ def intermediate_value(function, variable, intervals, tolerance=1e-10, limit=250
     fa_1 = intervals[0]
     fb = intervals[1]
     pn_1 = sum(intervals) / 2
-    condition = eval(function=function, variable=variable, value=fa_1) * eval(function=function,
-                                                                              variable=variable, value=fb)
+    condition = evaluate(function=function, variable=variable, value=fa_1) * evaluate(function=function,
+                                                                                      variable=variable, value=fb)
     iteration_1 = 0
     if condition < 0:
         while True:
             if iteration_1 == 0:
-                fn_1 = eval(function=function, variable=variable, value=pn_1)
-                fx_1 = eval(function=function, variable=variable, value=fa_1) * fn_1
+                fn_1 = evaluate(function=function, variable=variable, value=pn_1)
+                fx_1 = evaluate(function=function, variable=variable, value=fa_1) * fn_1
 
                 # iterations.append([iteration_1, intervals[0], intervals[1], pn_1])
                 # iterations['Iteration'].append(iteration_1)
                 iterations['a_n'].append(intervals[0])
                 iterations['b_n'].append(intervals[1])
                 iterations['p_n'].append(pn_1)
-                iterations['f_n'].append(eval(function=function, variable=variable,
-                                              value=pn_1))
+                iterations['f_n'].append(evaluate(function=function, variable=variable,
+                                                  value=pn_1))
                 if fx_1 < 0:
                     fx_1 *= -1.0
                     if fx_1 < tolerance:
@@ -50,8 +50,8 @@ def intermediate_value(function, variable, intervals, tolerance=1e-10, limit=250
 
             else:
                 pn_1 = (fa_1 + fb) / 2
-                fn_1 = eval(function=function, variable=variable, value=pn_1)
-                fx_1 = eval(function=function, variable=variable, value=fa_1) * fn_1
+                fn_1 = evaluate(function=function, variable=variable, value=pn_1)
+                fx_1 = evaluate(function=function, variable=variable, value=fa_1) * fn_1
 
                 # iterations.append(
                 # [fa_1, fb, ((fa_1 + fb) / 2), eval(function=function, variable=variable, value=pn_1)])
@@ -93,8 +93,8 @@ def secant(function, variable, intervals, tolerance=1e-10, limit=250, just_root=
         if n_iteration == 1:
             x_0 = intervals[0]
             x = intervals[1]
-            fx_n_1 = eval(function, variable, x)
-            fx_n = eval(function, variable, x_0)
+            fx_n_1 = evaluate(function, variable, x)
+            fx_n = evaluate(function, variable, x_0)
             x_x_0 = x - x_0
             x_x = (x - fx_n_1 * x_x_0) / (fx_n_1 - fx_n)
             iterations['x_n'].append(x)
@@ -116,8 +116,8 @@ def secant(function, variable, intervals, tolerance=1e-10, limit=250, just_root=
                     x = x_x
             n_iteration += 1
         else:
-            fx_n_1 = eval(function, variable, x)
-            fx_n = eval(function, variable, x_0)
+            fx_n_1 = evaluate(function, variable, x)
+            fx_n = evaluate(function, variable, x_0)
             x_x_0 = x - x_0
             if fx_n_1 - fx_n != 0:
                 x_x = (x - fx_n_1 * x_x_0 / (fx_n_1 - fx_n))
