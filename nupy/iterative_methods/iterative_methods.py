@@ -1,4 +1,4 @@
-from nupy.sympy_algebra import evaluate
+from nupy.sympy_algebra import evaluate, derive
 from pandas import DataFrame, set_option
 
 
@@ -20,7 +20,8 @@ def intermediate_value(function, variable, intervals, tolerance=1e-10, limit=250
     fb = intervals[1]
     pn_1 = sum(intervals) / 2
     condition = evaluate(function=function, variable=variable, value=fa_1) * evaluate(function=function,
-                                                                                      variable=variable, value=fb)
+                                                                                      variable=variable,
+                                                                                      value=fb)
     iteration_1 = 0
     if condition < 0:
         while True:
@@ -150,3 +151,42 @@ def secant(function, variable, intervals, tolerance=1e-10, limit=250, just_root=
             break
     data = DataFrame(iterations, columns=header)
     return data if not just_root else iterations['x_n'][len(iterations['x_n']) - 1]
+
+
+def fixedPoint(function, variable, intervals, tolerance=1e-10, limit=250, just_root=False):
+    __configure__()
+    iterations = {
+        'x_n': [],
+        'f(x_n)': []
+    }
+    header = ['x_n', 'f(x_n)']
+    diff = derive(function, variable)
+    x0 = intervals[0]
+    x = "x-((%s)/(%s))" % (function, diff)
+    xn = evaluate(x, variable, x0)
+    niter = 0
+    iterations['x_n'].append(x0)
+    iterations['f(x_n)'].append(xn)
+    cond = x0 - xn
+    if cond < 0:
+        cond *= -1
+    while cond > tolerance:
+        x0 = xn
+        xn = evaluate(x, variable, x0)
+        niter += 1
+        iterations['x_n'].append(x0)
+        iterations['f(x_n)'].append(xn)
+        cond = x0 - xn
+        if cond < 0:
+            cond *= -1
+        if limit > 0:
+            if niter > limit:
+                break
+            elif niter >= 250:
+                break
+        elif niter >= 250:
+            break
+    data = DataFrame(iterations, columns=header)
+    return data if not just_root else iterations['x_n'][len(iterations['x_n']) - 1]
+
+
