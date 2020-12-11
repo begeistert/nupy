@@ -1,4 +1,4 @@
-from nupy.iterative_methods import *
+from nupy.iterative_methods import intermediate_value, secant, fixedPoint, falsePosition
 
 
 def roots():
