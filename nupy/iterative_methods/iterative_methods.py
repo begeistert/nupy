@@ -8,6 +8,20 @@ def __configure__():
 
 
 def intermediate_value(function, variable, intervals, tolerance=1e-10, limit=250, just_root=False):
+    """
+
+    Gets the root of the given expression through iterations
+
+    ====
+    :param function: Expression to iterate
+    :param variable: Expression variable
+    :param intervals: Iteration intervals
+    :param tolerance: Error tolerance
+    :param limit: Iteration limit
+    :param just_root: Switch between DataFrame and root
+    :return: Return a DataFrame if just_root is not  or false,
+    otherwise return the root of the expression
+    """
     __configure__()
     iterations = {
         'a_n': [],
@@ -28,9 +42,6 @@ def intermediate_value(function, variable, intervals, tolerance=1e-10, limit=250
             if iteration_1 == 0:
                 fn_1 = evaluate(function=function, variable=variable, value=pn_1)
                 fx_1 = evaluate(function=function, variable=variable, value=fa_1) * fn_1
-
-                # iterations.append([iteration_1, intervals[0], intervals[1], pn_1])
-                # iterations['Iteration'].append(iteration_1)
                 iterations['a_n'].append(intervals[0])
                 iterations['b_n'].append(intervals[1])
                 iterations['p_n'].append(pn_1)
@@ -53,10 +64,6 @@ def intermediate_value(function, variable, intervals, tolerance=1e-10, limit=250
                 pn_1 = (fa_1 + fb) / 2
                 fn_1 = evaluate(function=function, variable=variable, value=pn_1)
                 fx_1 = evaluate(function=function, variable=variable, value=fa_1) * fn_1
-
-                # iterations.append(
-                # [fa_1, fb, ((fa_1 + fb) / 2), eval(function=function, variable=variable, value=pn_1)])
-                # iterations['Iteration'].append(iteration_1)
                 iterations['a_n'].append(fa_1)
                 iterations['b_n'].append(fb)
                 iterations['p_n'].append(((fa_1 + fb) / 2))
@@ -81,6 +88,19 @@ def intermediate_value(function, variable, intervals, tolerance=1e-10, limit=250
 
 
 def secant(function, variable, intervals, tolerance=1e-10, limit=250, just_root=False):
+    """
+        Gets the root of the given expression through iterations
+
+        ====
+        :param function: Expression to iterate
+        :param variable: Expression variable
+        :param intervals: Iteration intervals
+        :param tolerance: Error tolerance
+        :param limit: Iteration limit
+        :param just_root: Switch between DataFrame and root
+        :return: Return a DataFrame if just_root is not  or false,
+        otherwise return the root of the expression
+        """
     __configure__()
     iterations = {
         'x_n': [],
@@ -100,7 +120,6 @@ def secant(function, variable, intervals, tolerance=1e-10, limit=250, just_root=
             x_x = (x - fx_n_1 * x_x_0) / (fx_n_1 - fx_n)
             iterations['x_n'].append(x)
             iterations['f(x_n)'].append(fx_n)
-            # iterations.append([n_iteration, x, x_0, fx_n])
             e_x = fx_n
             if e_x < 0:
                 t_r = e_x * -1.0
@@ -126,7 +145,6 @@ def secant(function, variable, intervals, tolerance=1e-10, limit=250, just_root=
                 break
             iterations['x_n'].append(x)
             iterations['f(x_n)'].append(fx_n)
-            # iterations.append([n_iteration, x, x_0, fx_n])
             e_x = fx_n
             if e_x < 0:
                 t_r = e_x * -1.0
@@ -154,6 +172,19 @@ def secant(function, variable, intervals, tolerance=1e-10, limit=250, just_root=
 
 
 def fixedPoint(function, variable, intervals, tolerance=1e-10, limit=250, just_root=False):
+    """
+        Gets the root of the given expression through iterations
+
+        ====
+        :param function: Expression to iterate
+        :param variable: Expression variable
+        :param intervals: Iteration intervals
+        :param tolerance: Error tolerance
+        :param limit: Iteration limit
+        :param just_root: Switch between DataFrame and root
+        :return: Return a DataFrame if just_root is not  or false,
+        otherwise return the root of the expression
+    """
     __configure__()
     iterations = {
         'x_n': [],
@@ -188,5 +219,132 @@ def fixedPoint(function, variable, intervals, tolerance=1e-10, limit=250, just_r
             break
     data = DataFrame(iterations, columns=header)
     return data if not just_root else iterations['x_n'][len(iterations['x_n']) - 1]
+
+
+def falsePosition(function, variable, intervals, tolerance=1e-10, limit=250, just_root=False):
+    """
+        Gets the root of the given expression through iterations
+
+        ====
+        :param function: Expression to iterate
+        :param variable: Expression variable
+        :param intervals: Iteration intervals
+        :param tolerance: Error tolerance
+        :param limit: Iteration limit
+        :param just_root: Switch between DataFrame and root
+        :return: Return a DataFrame if just_root is not  or false,
+        otherwise return the root of the expression
+    """
+    __configure__()
+    x_0 = intervals[0]
+    x = intervals[1]
+    n_iteration = 1
+    iterations = {
+        'a_n': [],
+        'b_n': [],
+        'p_n': [],
+        'f_n': []
+    }
+    header = ['a_n', 'b_n', 'p_n', 'f_n']
+    condition = 0.0
+
+    stop = False
+
+    x_x = 0.0
+    t_r = 0.0
+    e_x = 0.0
+
+    while not stop:
+        if n_iteration == 1:
+            fx_n_1 = evaluate(function, variable, x)
+            fx_n = evaluate(function, variable, x_0)
+            x_x_0 = x - x_0
+            x_x = (x - fx_n_1 * x_x_0 / (fx_n_1 - fx_n))
+            fp_n = evaluate(function, variable, x_x)
+            iterations['b_n'].append(x)
+            iterations['a_n'].append(x_0)
+            iterations['p_n'].append(x_x)
+            iterations['f_n'].append(fp_n)
+            f_n = evaluate(function, variable, x_0) * fp_n
+            if f_n > 0:
+                e_x = fp_n
+                if e_x < 0:
+                    t_r = e_x * -1.0
+                    if t_r < tolerance:
+                        break
+                    else:
+                        if fp_n > 0:
+                            x = x_x
+                        elif fp_n < 0:
+                            x_0 = x_x
+                else:
+                    if e_x < tolerance:
+                        break
+                    else:
+                        if fp_n > 0:
+                            x = x_x
+                        elif fp_n < 0:
+                            x_0 = x_x
+            else:
+                e_x = fp_n
+                if e_x < 0:
+                    t_r = e_x * -1.0
+                    if t_r < tolerance:
+                        break
+                    else:
+                        if fp_n > 0:
+                            x = x_x
+                        elif fp_n < 0:
+                            x_0 = x_x
+                else:
+                    if e_x < tolerance:
+                        break
+                    else:
+                        if fp_n > 0:
+                            x = x_x
+                        elif fp_n < 0:
+                            x_0 = x_x
+            n_iteration += 1
+        else:
+            fx_n_1 = evaluate(function, variable, x)
+            fx_n = evaluate(function, variable, x_0)
+            x_x_0 = x - x_0
+            x_x = (x - fx_n_1 * x_x_0 / (fx_n_1 - fx_n))
+            fp_n = evaluate(function, variable, x_x)
+            iterations['b_n'].append(x)
+            iterations['a_n'].append(x_0)
+            iterations['p_n'].append(x_x)
+            iterations['f_n'].append(fp_n)
+            e_x = fp_n
+            if e_x < 0:
+                t_r = e_x * -1.0
+                if t_r < tolerance or condition == e_x:
+                    break
+                else:
+                    if fp_n > 0:
+                        x = x_x
+                    elif fp_n < 0:
+                        x_0 = x_x
+                    condition = e_x
+            else:
+                if e_x < tolerance or condition == e_x:
+                    break
+                else:
+                    if fp_n > 0:
+                        x = x_x
+                    elif fp_n < 0:
+                        x_0 = x_x
+                    condition = e_x
+            n_iteration += 2
+            if limit != 0:
+                if n_iteration > limit:
+                    break
+            else:
+                if n_iteration > 250:
+                    break
+    data = DataFrame(iterations, columns=header)
+    return data if not just_root else iterations['p_n'][len(iterations['p_n']) - 1]
+
+
 
 
